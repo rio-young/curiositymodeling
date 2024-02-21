@@ -25,40 +25,64 @@ sig Board {
     ships: pfunc Int -> Int -> Ship
 }
 
+// 5 ships each of sizes 5, 4, 3, 3, 2
+sig Ship{
+  size: one Int,
+  isSunk: one Boolean
+  //Everything but ship should be null, initially all places in ship should be False
+  // shipHit: pfunc Int -> Int -> Boolean
+}
+
+// All ships must be placed on the board, and must be placed horizontally or vertically - John
+pred ship_wellformed[ship: Ship] {
+  // Align horizonally or vertically if > 1
+  // Size = to number of positions
+
+  all ship: Ship | {
+    ship.size > 1
+    ship.size < 6
+  }
+  // Check if ship is sunk - Rio
+    // If for each existance on the board there is a shot on the baord
+}
+
+
+//checks if there is exactly one ship where the size is equal to size
+pred shipOfAllSizes[player: Player]{
+  #{ship: Ship | ship.size = 2} = 1
+  #{ship: Ship | ship.size = 3} = 2
+  #{ship: Ship | ship.size = 4} = 1
+  #{ship: Ship | ship.size = 5} = 1
+
+}
+
+
 // Init state of the game - Rio
 pred init {
   // True for both players
   all player : Player | {
   // Board needs to all be false
     all row, col: Int | {
-      not no player.playerBoard.shots[row][col] implies player.playerBoard.shots[row][col] = False
-
+      (row >= 0 and row <= 9 and col >= 0 and col <= 9) implies player.playerBoard.shots[row][col] = False
+      // All 5 shapes for each player
+      shipOfAllSizes[player]
     }
   // 5 ships for each player
-  // All 5 shapes for each player
+  #{ship: Ship | not no ship } = 5
+  }
   // All ships are not sunk
+  all ship: Ship | {
+    ship.isSunk = False
+    ship_wellformed[ship]
   }
 }
 
-//checks if there is exactly one ship where the size is equal to size
-pred shipOfAllSizes[player: Player]{
-  shipOfSize[2, player]
-  shipOfSize[4, player]
-  shipOfSize[5, player]
+run {
+  init
+  
+  } for exactly 1 BoardState, 5 Int, 5 Ship
 
-  //Since we need two ships with size three:
-  one disj ship1, ship2: Ship | {
-    #{row, col: Int | player.playerBoard.ships[row][col] = ship1} = size
-    #{row, col: Int | player.playerBoard.ships[row][col] = ship2} = size
-  }
-}
 
-//checks if there is exactly one ship where the size is equal to size
-pred shipOfSize[size: Int, player: Player]{
-  one ship: Ship | {
-    #{row, col: Int | player.playerBoard.ships[row][col] = ship} = size
-  }
-}
 
 // Two 10 x 10 boards, one for each player - John
 pred board_wellformed {
@@ -67,21 +91,8 @@ pred board_wellformed {
   // Check no ships are overlapping
 }
 
-// 5 ships each of sizes 5, 4, 3, 3, 2
-sig Ship{
-  size: one Int,
-  isSunk: one Boolean
-  //Everything but ship should be null, initially all places in ship should be False
-  // shipHit: pfunc Int -> Int -> Boolean
-}
-// All ships must be placed on the board, and must be placed horizontally or vertically - John
-pred ship_wellformed[ship: Ship] {
-  // Align horizonally or vertically if > 1
-  // Size = to number of positions
 
-  // Check if ship is sunk - Rio
-    // If for each existance on the board there is a shot on the baord
-}
+
 
 // Go turn by turn
 // Each turn is either a hit or miss
