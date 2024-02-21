@@ -4,20 +4,20 @@ abstract sig Boolean {}
 one sig True, False extends Boolean {}
 
 sig Game {
-  first: BoardState,
-  next: pfunc BoardState -> BoardState,
+  first: one BoardState,
+  next: pfunc BoardState -> BoardState
 }
 
 sig BoardState {
   player1: one Player,
-  player2: one Player,
+  player2: one Player
 }
 
 sig Player {
   playerBoard: one Board
 } 
 
-one sig player1, player2 extends Player {} 
+one sig Player1, Player2 extends Player {} 
 
 sig Board {
     //should all be false initially, true means the other player shot at that postion
@@ -28,10 +28,36 @@ sig Board {
 // Init state of the game - Rio
 pred init {
   // True for both players
+  all player : Player | {
   // Board needs to all be false
+    all row, col: Int | {
+      not no player.playerBoard.shots[row][col] implies player.playerBoard.shots[row][col] = False
+
+    }
   // 5 ships for each player
   // All 5 shapes for each player
   // All ships are not sunk
+  }
+}
+
+//checks if there is exactly one ship where the size is equal to size
+pred shipOfAllSizes[player: Player]{
+  shipOfSize[2, player]
+  shipOfSize[4, player]
+  shipOfSize[5, player]
+
+  //Since we need two ships with size three:
+  one disj ship1, ship2: Ship | {
+    #{row, col: Int | player.playerBoard.ships[row][col] = ship1} = size
+    #{row, col: Int | player.playerBoard.ships[row][col] = ship2} = size
+  }
+}
+
+//checks if there is exactly one ship where the size is equal to size
+pred shipOfSize[size: Int, player: Player]{
+  one ship: Ship | {
+    #{row, col: Int | player.playerBoard.ships[row][col] = ship} = size
+  }
 }
 
 // Two 10 x 10 boards, one for each player - John
@@ -44,7 +70,7 @@ pred board_wellformed {
 // 5 ships each of sizes 5, 4, 3, 3, 2
 sig Ship{
   size: one Int,
-  isSunk: one Boolean,
+  isSunk: one Boolean
   //Everything but ship should be null, initially all places in ship should be False
   // shipHit: pfunc Int -> Int -> Boolean
 }
