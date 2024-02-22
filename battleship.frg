@@ -25,19 +25,20 @@ sig Board {
     ships: pfunc Int -> Int -> Ship
 }
 
-// Init state of the game - Rio
-pred init {
-  // True for both players
-  all player : Player | {
-  // Board needs to all be false
-    all row, col: Int | {
-      not no player.playerBoard.shots[row][col] implies player.playerBoard.shots[row][col] = False
+// 5 ships each of sizes 5, 4, 3, 3, 2
+sig Ship{
+  size: one Int,
+  isSunk: one Boolean
+  //Everything but ship should be null, initially all places in ship should be False
+  // shipHit: pfunc Int -> Int -> Boolean
+}
+// All ships must be placed on the board, and must be placed horizontally or vertically - John
+pred ship_wellformed[ship: Ship] {
+  // Align horizonally or vertically if > 1
+  // Size = to number of positions
 
-    }
-  // 5 ships for each player
-  // All 5 shapes for each player
-  // All ships are not sunk
-  }
+  // Check if ship is sunk - Rio
+    // If for each existance on the board there is a shot on the baord
 }
 
 //checks if there is exactly one ship where the size is equal to size
@@ -53,6 +54,34 @@ pred shipOfAllSizes[player: Player]{
   }
 }
 
+// Init state of the game - Rio
+pred init[board: BoardState] {
+  
+  // True for both players
+  all player : Player | {
+  
+  // Board needs to all be false
+    all row, col: Int | {
+      not no player.playerBoard.shots[row][col] implies player.playerBoard.shots[row][col] = False
+
+    }
+  
+  // 5 ships for each player
+  // All 5 shapes for each player
+  all player: Player | {
+    shipOfAllSizes[player]
+  }
+
+  // Not shots yet
+  all boards: Board | {
+    all row, col: Int | {
+      boards.shots[row][col] = False
+    }
+  }
+
+  }
+}
+
 //checks if there is exactly one ship where the size is equal to size
 pred shipOfSize[size: Int, player: Player]{
   one ship: Ship | {
@@ -64,23 +93,23 @@ pred shipOfSize[size: Int, player: Player]{
 pred board_wellformed {
   // Player shots have to be 0-9
   // Player ships have to be 0-9
+  all row, col: Int, board: Board | {
+    board.shots[row][col] = True implies row >= 0 and row <= 9 and col >= 0 and col <= 9
+
+    some ship: Ship | {
+      board.ships[row][col] = ship implies row >= 0 and row <= 9 and col >= 0 and col <= 9
+    }
+  }
+
   // Check no ships are overlapping
-}
+  all row, col: Int, board: Board | {
+    some ship1, ship2: Ship | {
+      board.ships[row][col] = ship1 and board.ships[row][col] = ship2 implies ship1 = ship2
+    }
+  }
 
-// 5 ships each of sizes 5, 4, 3, 3, 2
-sig Ship{
-  size: one Int,
-  isSunk: one Boolean
-  //Everything but ship should be null, initially all places in ship should be False
-  // shipHit: pfunc Int -> Int -> Boolean
-}
-// All ships must be placed on the board, and must be placed horizontally or vertically - John
-pred ship_wellformed[ship: Ship] {
-  // Align horizonally or vertically if > 1
-  // Size = to number of positions
 
-  // Check if ship is sunk - Rio
-    // If for each existance on the board there is a shot on the baord
+
 }
 
 // Go turn by turn
