@@ -39,20 +39,47 @@ pred ship_wellformed[ship: Ship] {
 
   // Check if ship is sunk - Rio
     // If for each existance on the board there is a shot on the baord
+  all ship: Ship | {
+    ship.size > 1
+    ship.size < 6
+  }
+  // Check if ship is sunk - Rio
+    // If for each existance on the board there is a shot on the baord
 }
+
 
 //checks if there is exactly one ship where the size is equal to size
 pred shipOfAllSizes[player: Player]{
-  shipOfSize[2, player]
-  shipOfSize[4, player]
-  shipOfSize[5, player]
+  #{ship: Ship | ship.size = 2} = 1
+  #{ship: Ship | ship.size = 3} = 2
+  #{ship: Ship | ship.size = 4} = 1
+  #{ship: Ship | ship.size = 5} = 1
 
-  //Since we need two ships with size three:
-  one disj ship1, ship2: Ship | {
-    #{row, col: Int | player.playerBoard.ships[row][col] = ship1} = size
-    #{row, col: Int | player.playerBoard.ships[row][col] = ship2} = size
-  }
 }
+
+
+// // Init state of the game - Rio
+// pred init {
+//   // True for both players
+//   all player : Player | {
+//   // Board needs to all be false
+//     all row, col: Int | {
+//       (row >= 0 and row <= 9 and col >= 0 and col <= 9) implies player.playerBoard.shots[row][col] = False
+//       // All 5 shapes for each player
+//       shipOfAllSizes[player]
+//     }
+//   // 5 ships for each player
+//   #{ship: Ship | not no ship } = 5
+//   }
+//   // All ships are not sunk
+//   all ship: Ship | {
+//     ship.isSunk = False
+//     ship_wellformed[ship]
+//   }
+// }
+
+
+
 
 // Init state of the game - Rio
 pred init[board: BoardState] {
@@ -81,6 +108,8 @@ pred init[board: BoardState] {
 
   }
 }
+
+run {init} for exactly 1 BoardState, 5 Int, 5 Ship
 
 //checks if there is exactly one ship where the size is equal to size
 pred shipOfSize[size: Int, player: Player]{
@@ -111,6 +140,7 @@ pred board_wellformed {
 
 
 }
+
 
 // Go turn by turn
 // Each turn is either a hit or miss
