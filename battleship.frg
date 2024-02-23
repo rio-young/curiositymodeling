@@ -83,30 +83,16 @@ pred shipOfAllSizes[player: Player]{
 
 // Init state of the game - Rio
 pred init[board: BoardState] {
-  
-  // True for both players
-  all player : Player | {
-  
   // Board needs to all be false
     all row, col: Int | {
-      not no player.playerBoard.shots[row][col] implies player.playerBoard.shots[row][col] = False
-
+      board.player1.playerBoard.shots[row][col] = False
+      board.player2.playerBoard.shots[row][col] = False
     }
   
   // 5 ships for each player
   // All 5 shapes for each player
-  all player: Player | {
-    shipOfAllSizes[player]
-  }
-
-  // Not shots yet
-  all boards: Board | {
-    all row, col: Int | {
-      boards.shots[row][col] = False
-    }
-  }
-
-  }
+  shipOfAllSizes[board.player1]
+  shipOfAllSizes[board.player2]
 }
 
 run {init} for exactly 1 BoardState, 5 Int, 5 Ship
