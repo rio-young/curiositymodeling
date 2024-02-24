@@ -128,13 +128,17 @@ pred ship_wellformed[board: Board] {
     ship.size > 1
     ship.size < 6
 
-    //REMOVE LATER
-    ship.size = 2
+    // //REMOVE LATER
+    // ship.size = 2
 
-    ship.size = 2 implies shipSize2[ship, board]
-    ship.size = 3 implies shipSize3[ship, board]
-    ship.size = 4 implies shipSize4[ship, board]
-    ship.size = 5 implies shipSize5[ship, board]
+    // ship.size = 2 implies shipSize2[ship, board]
+    // ship.size = 3 implies shipSize3[ship, board]
+    // ship.size = 4 implies shipSize4[ship, board]
+    // ship.size = 5 implies shipSize5[ship, board]
+
+    one row, col: Int | {
+      board.ships[row][col] = ship
+    }
 
   // Check if ship is sunk - Rio
     // If for each existance on the board there is a shot on the board
@@ -163,8 +167,8 @@ pred init[board: BoardState] {
   }
   // 5 ships for each player
   // All 5 shapes for each player
-  // shipOfAllSizes[board.player1]
-  // shipOfAllSizes[board.player2]
+  shipOfAllSizes[board.player1]
+  shipOfAllSizes[board.player2]
 
   ship_wellformed[board.player1]
   ship_wellformed[board.player2]
@@ -245,7 +249,7 @@ pred trace {
   // Check for win and keep same if won
 }
 
-run {trace} for exactly 1 BoardState, exactly 1 Ship
+run {trace} for exactly 1 BoardState, exactly 5 Ship
 
 // Winning
 pred winning[b: BoardState] {
