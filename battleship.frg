@@ -27,44 +27,37 @@ sig Ship{
   // shipHit: pfunc Int -> Int -> Boolean
 }
 
-//Assumes that the ship being passed in is of size 2
-pred shipSize2[ship:Ship, board: Board]{
-  // assert ship.size = 2
-  // #{row: Int | some col: Int | board.ships[row][col] = ship} = 2 or
-  // #{col: Int | some row: Int | board.ships[row][col] = ship} = 2
 
-  // #{row: Int | some col: Int | board.ships[row][col] = ship} = 2 implies not #{col: Int | some row: Int | board.ships[row][col] = ship} = 2
-  // #{col: Int | some row: Int | board.ships[row][col] = ship} = 2 implies not #{row: Int | some col: Int | board.ships[row][col] = ship} = 2
-
-  // #{row: Int | some col: Int | board.ships[row][col] = ship} = 2 <=> #{col: Int | some row: Int | board.ships[row][col] = ship} = 1
-  // #{col: Int | some row: Int | board.ships[row][col] = ship} = 2 <=> #{row: Int | some col: Int | board.ships[row][col] = ship} = 1
-
-  // some row, col: Int | {
-  //   //Horizontal
-  //   (board.ships[row][col] = ship and board.ships[add[row, 1]][col] = ship) or
-  //   //Vertical
-  //   (board.ships[row][col] = ship and board.ships[row][add[col, 1]] = ship)
-  // }
-
-  // one row, col: Int | {
-  //   //Vertical
-  //   (board.ships[row][col] = ship and board.ships[add[row, 1]][col] = ship) and 
-  //   (all row2, col2: Int | {
-  //     ((row2 = row and col2 = col) or
-  //     (row2 = add[row, 1] and col2 = col)) implies not no board.ships[row2][col2] else no board.ships[row2][col2]
-  //   })
-  // }
-
+pred hori_ship_2[ship:Ship, board: Board]{
   some row, col: Int | {
     board.ships[row][col] = ship and board.ships[add[row, 1]][col] = ship
     all row2, col2: Int | {
-      ((row2 != row or col2 != col) and (row2 != add[row, 1] or col2 != col))  implies no board.ships[row2][col2]
+      (not ((row2 = row and col2 = col) or (row2 = add[row, 1] and col2 = col)))  implies no board.ships[row2][col2]
     }
-
   }
+}
 
+pred vert_ship_2[ship:Ship, board: Board]{
+  some row, col: Int | {
+    board.ships[row][col] = ship and board.ships[row][add[col, 1]] = ship
+    all row2, col2: Int | {
+      ((row2 != row or col2 != col) and (row2 != row or col2 != add[col, 1]))  implies no board.ships[row2][col2]
+    }
+  }
+}
+
+//Assumes that the ship being passed in is of size 2
+pred shipSize2[ship:Ship, board: Board]{
+  // assert ship.size = 2
+
+  hori_ship_2[ship, board] 
+  // vert_ship_2[ship, board]
+
+  // hori_ship_2[ship, board] <=> not vert_ship_2[ship, board]
+  // vert_ship_2[ship, board] <=> not hori_ship_2[ship, board] 
   
 }
+
 
 //Assumes that the ship being passed in is of size 3
 pred shipSize3[ship:Ship, board: Board]{
@@ -151,14 +144,13 @@ pred shipOfAllSizes[board: Board]{
 }
 
 // Init state of the game - Rio
-pred init {
-  // True for both players
-  all player : Player | {
+pred init[board: BoardState] {
+
   // Board needs to all be false
-    all row, col: Int | {
-      board.player1.shots[row][col] = False
-      board.player2.shots[row][col] = False
-    }
+  all row, col: Int | {
+    board.player1.shots[row][col] = False
+    board.player2.shots[row][col] = False
+  }
   // 5 ships for each player
   // All 5 shapes for each player
   // shipOfAllSizes[board.player1]
