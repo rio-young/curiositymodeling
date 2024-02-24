@@ -113,7 +113,14 @@ pred shipSize5[ship:Ship, board: Board]{
   }
 }
 
-// All ships must be placed on the board, and must be placed horizontally or vertically - John
+//Ensures that if the isSunk is true then each part of the ship has indeed been hit
+pred ship_sunk_wellformed[ship: Ship, board: Board]{
+  (all row, col: Int | {
+    board.shots[row][col] = True and board.ships[row][col] = ship 
+  }) implies ship.isSunk = True else ship.isSunk = False 
+}
+
+// All ships must be placed on the board, and must be placed horizontally or vertically - Rio
 pred ship_wellformed[board: Board] {
   // Align horizonally or vertically if > 1
   // Size = to number of positions
@@ -129,9 +136,12 @@ pred ship_wellformed[board: Board] {
     ship.size = 4 implies shipSize4[ship, board]
     ship.size = 5 implies shipSize5[ship, board]
 
-  }
   // Check if ship is sunk - Rio
-    // If for each existance on the board there is a shot on the baord
+    // If for each existance on the board there is a shot on the board
+    ship_sunk_wellformed[ship, board]
+
+  }
+  
 }
 
 
@@ -194,8 +204,6 @@ pred board_wellformed {
     }
   }
 
-
-
 }
 
 
@@ -208,6 +216,9 @@ pred move {
   // If both players haven same then player one ortherwise player two
   // Check if the spot has not been shot
   // If has not then make shot make sure shot is within 0-9
+  //NEED TO ENSURE SHIPS STAY WELLFORMED
+  // ship_wellformed[board.player1] for pre and post
+  // ship_wellformed[board.player2] for pre and post
 }
 
 // pred game_trace {
@@ -224,24 +235,39 @@ pred trace {
   // Board wellformed
   board_wellformed
   // Ship wellformed
+
   // Move
+  all b: BoardState | { some Game.next[b] implies {
+    //UNCOMMENT AND MODIFY WHEN MOVE IS FINISHED
+    // some row, col: Int, p: Player | 
+    //     // move[b, row, col, p, Game.next[b]]
+        }}
   // Check for win and keep same if won
 }
 
 run {trace} for exactly 1 BoardState, exactly 1 Ship
 
-// When all positions on boat are hit, the ship is sunk
-// pred shipSunk{}
-
 // Winning
-pred winning {
+pred winning[b: BoardState] {
   // Check if a player has all their ships sunk
   // Wining previousely implies the game state
+  allBoatsSunk[b.player1] or
+  allBoatsSunk[b.player2]
+
+}
+
+// When all positions on boat are hit, the ship is sunk
+//Assumes that because we check ship_sunk_wellformed, a ship's isSunk will only be True if it is actually sunk
+pred ship_sunk[ship: Ship]{
+  ship.isSunk = True
 }
 
 // When all boats for a player are sunk, they lose and the game ends
 pred allBoatsSunk[board: Board] {
   // Check all the ships are sunk for the player
+  all row, col: Int | {
+    not no board.ships[row][col] implies ship_sunk[board.ships[row][col]]
+  }
 }
 
 
