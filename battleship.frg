@@ -27,8 +27,6 @@ sig Ship{
   // shipHit: pfunc Int -> Int -> Boolean
 }
 
-<<<<<<< Updated upstream
-=======
 //Assumes that the ship being passed in is of size 2
 pred shipSize2[ship:Ship, board: Board]{
   // assert ship.size = 2
@@ -122,15 +120,10 @@ pred shipSize5[ship:Ship, board: Board]{
   }
 }
 
->>>>>>> Stashed changes
 // All ships must be placed on the board, and must be placed horizontally or vertically - John
 pred ship_wellformed[board: Board] {
   // Align horizonally or vertically if > 1
   // Size = to number of positions
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
   all ship: Ship | {
     ship.size > 1
     ship.size < 6
@@ -157,34 +150,16 @@ pred shipOfAllSizes[board: Board]{
   #{ship: Ship | ship.size = 5} = 1
 }
 
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
 // Init state of the game - Rio
 pred init {
   // True for both players
   all player : Player | {
   // Board needs to all be false
     all row, col: Int | {
-<<<<<<< Updated upstream
-      (row >= 0 and row <= 9 and col >= 0 and col <= 9) implies player.playerBoard.shots[row][col] = False
-      // All 5 shapes for each player
-      shipOfAllSizes[player]
-=======
       board.player1.shots[row][col] = False
       board.player2.shots[row][col] = False
->>>>>>> Stashed changes
     }
   // 5 ships for each player
-<<<<<<< Updated upstream
-  #{ship: Ship | not no ship } = 5
-  }
-  // All ships are not sunk
-  all ship: Ship | {
-    ship.isSunk = False
-    ship_wellformed[ship]
-=======
   // All 5 shapes for each player
   // shipOfAllSizes[board.player1]
   // shipOfAllSizes[board.player2]
@@ -194,28 +169,17 @@ pred init {
 
   all ship: Ship | {
     ship.isSunk = False
->>>>>>> Stashed changes
   }
 
 }
 
-<<<<<<< Updated upstream
-run {
-  init
-  
-  } for exactly 1 BoardState, 5 Int, 5 Ship
-
-=======
 fun MAX: one Int { 7 }
->>>>>>> Stashed changes
 
 
 // Two 10 x 10 boards, one for each player - John
 pred board_wellformed {
   // Player shots have to be 0-9
   // Player ships have to be 0-9
-<<<<<<< Updated upstream
-=======
   all row, col: Int, board: Board | {
     board.shots[row][col] = True implies row >= 0 and row <= MAX and col >= 0 and col <= MAX
     // (row < 0 or row > MAX or col < 0 or col > MAX) implies no board.shots[row][col]
@@ -225,7 +189,6 @@ pred board_wellformed {
     }
   }
 
->>>>>>> Stashed changes
   // Check no ships are overlapping
 }
 
