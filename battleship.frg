@@ -19,6 +19,10 @@ sig Board {
     ships: pfunc Int -> Int -> Ship
 }
 
+fun countShots[board: Board] : Int {
+  #{row, col: Int | board.shots[row][col] = True}
+}
+
 // 5 ships each of sizes 5, 4, 3, 3, 2
 sig Ship{
   size: one Int,
@@ -211,11 +215,18 @@ pred board_wellformed {
 }
 
 
+pred player1Turn[b: BoardState] {
+  countShots[b.player1] = countShots[b.player2]
+}
+pred player2Turn[b: BoardState] {
+  countShots[b.player1] = add[countShots[b.player2], 1]
+}
+
 // Go turn by turn
 // Each turn is either a hit or miss
   // Hit: the position corresponds to a ship on the other players board
   // Miss: does not hit
-pred move {
+pred move[pre, post: BoardState, p: Player, row, col: Int] {
   // Count shots and determine player one or player two
   // If both players haven same then player one ortherwise player two
   // Check if the spot has not been shot
@@ -223,6 +234,30 @@ pred move {
   //NEED TO ENSURE SHIPS STAY WELLFORMED
   // ship_wellformed[board.player1] for pre and post
   // ship_wellformed[board.player2] for pre and post
+
+  p = Player1 implies player1Turn[pre]
+  p = Player2 implies player2Turn[pre]
+  
+  (Player1 = p implies {
+    pre.player2.shots[row][col] = False
+    post.player2.shots[row][col] = True
+  } or
+  Player2 = p implies {
+    pre.player1.shots[row][col] = False
+    post.player1.shots[row][col] = True
+  })
+
+  all row2, col2: Int | {
+    (row2 != row or col2 != col) implies {
+      pre.player1.shots[row2][col2] = post.player1.shots[row2][col2]
+      pre.player2.shots[row2][col2] = post.player2.shots[row2][col2]
+    }
+  }
+
+  ship_wellformed[pre.player1]
+  ship_wellformed[pre.player2]
+  ship_wellformed[post.player1]
+  ship_wellformed[post.player2]
 }
 
 // pred game_trace {
@@ -242,10 +277,9 @@ pred trace {
 
   // Move
   all b: BoardState | { some Game.next[b] implies {
-    //UNCOMMENT AND MODIFY WHEN MOVE IS FINISHED
-    // some row, col: Int, p: Player | 
-    //     // move[b, row, col, p, Game.next[b]]
-        }}
+    some row, col: Int, p: Player | 
+      move[b, row, col, p, Game.next[b]]
+    }}
   // Check for win and keep same if won
 }
 
