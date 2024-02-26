@@ -27,196 +27,10 @@ fun countShips[board: Board] : Int {
   #{row, col: Int | board.ships[row][col] = True}
 }
 
-// // 5 ships each of sizes 5, 4, 3, 3, 2
-// sig Ship{
-//   size: one Int,
-//   isSunk: one Boolean
-//   //Everything but ship should be null, initially all places in ship should be False
-//   // shipHit: pfunc Int -> Int -> Boolean
-// }
-
-
-// pred hori_ship_2[ship:Ship, board: Board]{
-//   some row, col: Int | {
-//     board.ships[row][col] = ship and board.ships[add[row, 1]][col] = ship
-//     all row2, col2: Int | {
-//       (not ((row2 = row and col2 = col) or (row2 = add[row, 1] and col2 = col)))  implies no board.ships[row2][col2]
-//     }
-//   }
-// }
-
-// pred vert_ship_2[ship:Ship, board: Board]{
-//   some row, col: Int | {
-//     board.ships[row][col] = ship and board.ships[row][add[col, 1]] = ship
-//     all row2, col2: Int | {
-//       ((row2 != row or col2 != col) and (row2 != row or col2 != add[col, 1]))  implies no board.ships[row2][col2]
-//     }
-//   }
-// }
-
-//Assumes that the ship being passed in is of size 2
-// pred shipSize2[ship:Ship, board: Board]{
-//   // assert ship.size = 2
-
-//   hori_ship_2[ship, board] 
-//   // vert_ship_2[ship, board]
-
-//   // hori_ship_2[ship, board] <=> not vert_ship_2[ship, board]
-//   // vert_ship_2[ship, board] <=> not hori_ship_2[ship, board] 
-  
-// }
-
-
-// //Assumes that the ship being passed in is of size 3
-// pred shipSize3[ship:Ship, board: Board]{
-//   // assert ship.size = 2
-//   #{row, col: Int | board.ships[row][col] = ship} = 3
-//   some row, col: Int | {
-//     //Horizontal
-//     (board.ships[row][col] = ship and 
-//     board.ships[add[row, 1]][col] = ship and 
-//     board.ships[add[row, 2]][col] = ship) or
-//     //Vertical
-//     (board.ships[row][col] = ship and 
-//     board.ships[row][add[col, 1]] = ship and 
-//     board.ships[row][add[col, 2]] = ship)
-//   }
-// }
-
-// //Assumes that the ship being passed in is of size 4
-// pred shipSize4[ship:Ship, board: Board]{
-//   // assert ship.size = 2
-//   #{row, col: Int | board.ships[row][col] = ship} = 4
-//   some row, col: Int | {
-//     //Horizontal
-//     (board.ships[row][col] = ship and 
-//     board.ships[add[row, 1]][col] = ship and 
-//     board.ships[add[row, 2]][col] = ship and 
-//     board.ships[add[row, 3]][col] = ship) or
-//     //Vertical
-//     (board.ships[row][col] = ship and 
-//     board.ships[row][add[col, 1]] = ship and 
-//     board.ships[row][add[col, 2]] = ship and 
-//     board.ships[row][add[col, 3]] = ship)
-//   }
-// }
-
-// //Assumes that the ship being passed in is of size 4
-// pred shipSize5[ship:Ship, board: Board]{
-
-//   #{row, col: Int | board.ships[row][col] = ship} = 5
-//   some row, col: Int | {
-//     //Horizontal
-//     (board.ships[row][col] = ship and 
-//     board.ships[add[row, 1]][col] = ship and 
-//     board.ships[add[row, 2]][col] = ship and 
-//     board.ships[add[row, 3]][col] = ship and 
-//     board.ships[add[row, 4]][col] = ship) or
-//     //Vertical
-//     (board.ships[row][col] = ship and 
-//     board.ships[row][add[col, 1]] = ship and 
-//     board.ships[row][add[col, 2]] = ship and 
-//     board.ships[row][add[col, 3]] = ship and 
-//     board.ships[row][add[col, 4]] = ship)
-//   }
-// }
-
-//Ensures that if the isSunk is true then each part of the ship has indeed been hit
-// pred ship_sunk_wellformed[ship: Ship, board: Board]{
-//   (all row, col: Int | {
-//     board.shots[row][col] = True and board.ships[row][col] = ship 
-//   }) implies ship.isSunk = True else ship.isSunk = False 
-// }
-
 // All ships must be placed on the board, and must be placed horizontally or vertically - Rio
 pred ship_wellformed[board: Board] {
-  // Align horizonally or vertically if > 1
-  // Size = to number of positions
-  // all ship: Ship | {
-  //   ship.size > 1
-  //   ship.size < 6
-
-  //   // //REMOVE LATER
-  //   // ship.size = 2
-
-  //   // ship.size = 2 implies shipSize2[ship, board]
-  //   // ship.size = 3 implies shipSize3[ship, board]
-  //   // ship.size = 4 implies shipSize4[ship, board]
-  //   // ship.size = 5 implies shipSize5[ship, board]
-
-  //   one row, col: Int | {
-  //     board.ships[row][col] = ship
-  //   }
-
-  // // Check if ship is sunk - Rio
-  //   // If for each existance on the board there is a shot on the board
-  //   ship_sunk_wellformed[ship, board]
-
-  // }
-
   countShips[board] = 5
-
-  // some row1, col1, row2, col2, row3, col3, row4, col4, row5, col5: Int | {
-  //   board.ships[row1][col1] = True
-  //   board.ships[row2][col2] = True
-  //   board.ships[row3][col3] = True
-  //   board.ships[row4][col4] = True
-  //   board.ships[row5][col5] = True
-
-  //   row1 = row2 implies col1 != col2
-  //   row1 = row3 implies col1 != col3
-  //   row1 = row4 implies col1 != col4
-  //   row1 = row5 implies col1 != col5
-  //   row2 = row3 implies col2 != col3
-  //   row2 = row4 implies col2 != col4
-  //   row2 = row5 implies col2 != col5
-  //   row3 = row4 implies col3 != col4
-
-  //   col1 = col2 implies row1 != row2
-  //   col1 = col3 implies row1 != row3
-  //   col1 = col4 implies row1 != row4
-  //   col1 = col5 implies row1 != row5
-  //   col2 = col3 implies row2 != row3
-  //   col2 = col4 implies row2 != row4
-  //   col2 = col5 implies row2 != row5
-  // }
-
-  // not (some row1, col1, row2, col2, row3, col3, row4, col4, row5, col5, row6, col6: Int | {
-  //   board.ships[row1][col1] = True
-  //   board.ships[row2][col2] = True
-  //   board.ships[row3][col3] = True
-  //   board.ships[row4][col4] = True
-  //   board.ships[row5][col5] = True
-  //   board.ships[row6][col6] = True
-
-  //   row1 = row2 implies col1 != col2
-  //   row1 = row3 implies col1 != col3
-  //   row1 = row4 implies col1 != col4
-  //   row1 = row5 implies col1 != col5
-  //   row2 = row3 implies col2 != col3
-  //   row2 = row4 implies col2 != col4
-  //   row2 = row5 implies col2 != col5
-  //   row3 = row4 implies col3 != col4
-
-  //   col1 = col2 implies row1 != row2
-  //   col1 = col3 implies row1 != row3
-  //   col1 = col4 implies row1 != row4
-  //   col1 = col5 implies row1 != row5
-  //   col2 = col3 implies row2 != row3
-  //   col2 = col4 implies row2 != row4
-  //   col2 = col5 implies row2 != row5
-  // })
-  
 }
-
-
-//checks if there is exactly one ship where the size is equal to size
-// pred shipOfAllSizes[board: Board]{
-//   #{ship: Ship | ship.size = 2} = 1
-//   #{ship: Ship | ship.size = 3} = 2
-//   #{ship: Ship | ship.size = 4} = 1
-//   #{ship: Ship | ship.size = 5} = 1
-// }
 
 // Init state of the game - Rio
 pred init[board: BoardState] {
@@ -226,24 +40,12 @@ pred init[board: BoardState] {
     board.player1.shots[row][col] = False
     board.player2.shots[row][col] = False
   }
-  // 5 ships for each player
-  // All 5 shapes for each player
-  // shipOfAllSizes[board.player1]
-  // shipOfAllSizes[board.player2]
 
   ship_wellformed[board.player1]
   ship_wellformed[board.player2]
-
 }
 
 fun MAX: one Int { 7 }
-
-// //checks if there is exactly one ship where the size is equal to size
-// pred shipOfSize[size: Int, player: Player]{
-//   one ship: Ship | {
-//     #{row, col: Int | player.playerBoard.ships[row][col] = ship} = size
-//   }
-// }
 
 // Two 10 x 10 boards, one for each player - John
 pred board_wellformed {
@@ -255,9 +57,16 @@ pred board_wellformed {
     board.ships[row][col] = True implies row >= 0 and row <= MAX and col >= 0 and col <= MAX
   }
 
-  all boardState: BoardState | {
-    boardState.player1 != boardState.player2
-  }
+  // all boardState: BoardState | {
+  //   boardState.player1 != boardState.player2
+  // }
+
+  // all disj b1, b2: BoardState | {
+  //   b1.player1 != b2.player1
+  //   b1.player1 != b2.player2
+  //   b1.player2 != b2.player1
+  //   b1.player2 != b2.player2
+  // }
 
 }
 
@@ -281,21 +90,27 @@ pred move[pre, post: BoardState, row, col: Int] {
   //NEED TO ENSURE SHIPS STAY WELLFORMED
   // ship_wellformed[board.player1] for pre and post
   // ship_wellformed[board.player2] for pre and post
+
+  row >= 0 and row <= MAX
+  col >= 0 and col <= MAX
   
-  (player1Turn[pre] implies {
+  player1Turn[pre] => {
     pre.player1.shots[row][col] = False
     post.player1.shots[row][col] = True
-  } or
-  player2Turn[pre] implies {
+  }
+  player2Turn[pre] => {
     pre.player2.shots[row][col] = False
     post.player2.shots[row][col] = True
-  })
+  }
 
   all row2, col2: Int | {
     (row2 != row or col2 != col) implies {
       pre.player1.shots[row2][col2] = post.player1.shots[row2][col2]
       pre.player2.shots[row2][col2] = post.player2.shots[row2][col2]
     }
+
+    pre.player1.ships[row2][col2] = post.player1.ships[row2][col2]
+    pre.player2.ships[row2][col2] = post.player2.ships[row2][col2]
   }
 
   ship_wellformed[pre.player1]
@@ -304,14 +119,6 @@ pred move[pre, post: BoardState, row, col: Int] {
   ship_wellformed[post.player2]
 }
 
-// pred game_trace {
-//     initial[Game.first]
-//     all b: Board | { some Game.next[b] implies {
-//         some row, col: Int, p: Player | 
-//             move[b, row, col, p, Game.next[b]]
-//         -- TODO: ensure X moves first
-//     }}
-// }
 pred trace {
   // Init
   init[Game.first]
@@ -327,7 +134,7 @@ pred trace {
   // Check for win and keep same if won
 }
 
-run {trace} for exactly 5 BoardState
+run {trace} for exactly 3 BoardState for {next is linear}
 
 // Winning
 pred winning[b: BoardState] {
