@@ -53,7 +53,6 @@ pred board_wellformed {
   // Player ships have to be 0-9
   all row, col: Int, board: Board | {
     board.shots[row][col] = True implies row >= 0 and row <= MAX and col >= 0 and col <= MAX
-    // (row < 0 or row > MAX or col < 0 or col > MAX) implies no board.shots[row][col]
     board.ships[row][col] = True implies row >= 0 and row <= MAX and col >= 0 and col <= MAX
   }
 
@@ -94,23 +93,33 @@ pred move[pre, post: BoardState, row, col: Int] {
   row >= 0 and row <= MAX
   col >= 0 and col <= MAX
   
-  player1Turn[pre] => {
+  player1Turn[pre] implies {
     pre.player1.shots[row][col] = False
     post.player1.shots[row][col] = True
+
+    all row1, col1: Int | {
+      (row1 != row or col1 != col) implies {
+        pre.player1.shots[row1][col1] = post.player1.shots[row1][col1]
+      }
+      pre.player2.shots[row1][col1] = post.player2.shots[row1][col1]
+    }
   }
   player2Turn[pre] => {
     pre.player2.shots[row][col] = False
     post.player2.shots[row][col] = True
+
+    all row2, col2: Int | {
+      (row2 != row or col2 != col) implies {
+        pre.player2.shots[row2][col2] = post.player2.shots[row2][col2]
+      }
+      pre.player1.shots[row2][col2] = post.player1.shots[row2][col2]
+
+    }
   }
 
-  all row2, col2: Int | {
-    (row2 != row or col2 != col) implies {
-      pre.player1.shots[row2][col2] = post.player1.shots[row2][col2]
-      pre.player2.shots[row2][col2] = post.player2.shots[row2][col2]
-    }
-
-    pre.player1.ships[row2][col2] = post.player1.ships[row2][col2]
-    pre.player2.ships[row2][col2] = post.player2.ships[row2][col2]
+  all row3, col3: Int | {
+    pre.player1.ships[row3][col3] = post.player1.ships[row3][col3]
+    pre.player2.ships[row3][col3] = post.player2.ships[row3][col3]
   }
 
   ship_wellformed[pre.player1]
