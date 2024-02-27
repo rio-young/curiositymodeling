@@ -28,9 +28,71 @@ fun countShips[board: Board] : Int {
   #{row, col: Int | board.ships[row][col] = True}
 }
 
-// All ships must be placed on the board, and must be placed horizontally or vertically - Rio
+pred shipSizeOne[board: Board, row, col: Int] {
+  board.ships[row][col] = True
+}
+
+pred shipSizeTwo[board: Board, row, col: Int] {
+  (board.ships[row][col] = True and
+  board.ships[row][add[col, 1]] = True)
+  or
+  (board.ships[row][col] = True and
+  board.ships[add[row, 1]][col] = True)
+}
+
+pred shipSizeThree[board: Board, row, col: Int] {
+  (board.ships[row][col] = True and
+  board.ships[row][add[col, 1]] = True and
+  board.ships[row][add[col, 2]] = True)
+  or
+  (board.ships[row][col] = True and
+  board.ships[add[row, 1]][col] = True and
+  board.ships[add[row, 2]][col] = True)
+}
+
+pred shipSizeFour[board: Board, row, col: Int] {
+  (board.ships[row][col] = True and
+  board.ships[row][add[col, 1]] = True and
+  board.ships[row][add[col, 2]] = True and
+  board.ships[row][add[col, 3]] = True)
+  or
+  (board.ships[row][col] = True and
+  board.ships[add[row, 1]][col] = True and
+  board.ships[add[row, 2]][col] = True and
+  board.ships[add[row, 3]][col] = True)
+}
+
+pred shipSizeFive[board: Board, row, col: Int] {
+  (board.ships[row][col] = True and
+  board.ships[row][add[col, 1]] = True and
+  board.ships[row][add[col, 2]] = True and
+  board.ships[row][add[col, 3]] = True and
+  board.ships[row][add[col, 4]] = True)
+  or
+  (board.ships[row][col] = True and
+  board.ships[add[row, 1]][col] = True and
+  board.ships[add[row, 2]][col] = True and
+  board.ships[add[row, 3]][col] = True and
+  board.ships[add[row, 4]][col] = True)
+}
+
+// Ships are wellformed
 pred ship_wellformed[board: Board] {
-  countShips[board] = 5
+
+  // One ship of size 5
+  one row1, col1, row2, col2, row3, col3, row4, col4, row5, col5: Int | {
+    shipSizeFive[board, row1, col1]
+    and
+    shipSizeFour[board, row2, col2]
+    and
+    shipSizeThree[board, row3, col3]
+    and
+    shipSizeTwo[board, row4, col4]
+    and
+    shipSizeOne[board, row5, col5]
+  }
+
+  countShips[board] = 15
 }
 
 // Init state of the game - Rio
@@ -83,6 +145,7 @@ pred balancedTurns[b: BoardState] {
 pred move[pre, post: BoardState, row, col: Int] {
   // Check if the position has already been shot at
   balancedTurns[pre]
+  
   player1Turn[pre] => {
     pre.player1.shots[row][col] = False
     post.player1.shots[row][col] = True
@@ -96,6 +159,7 @@ pred move[pre, post: BoardState, row, col: Int] {
       pre.player2.shots[row1][col1] = post.player2.shots[row1][col1]
     }
   }
+
   player2Turn[pre] => {
     pre.player2.shots[row][col] = False
     post.player2.shots[row][col] = True
@@ -129,7 +193,7 @@ pred trace {
   // Check for win and keep same if won
 }
 
-run {trace} for 4 BoardState for {next is linear}
+run {trace} for 1 BoardState for {next is linear}
 
 // // Winning
 // pred winning[b: BoardState] {
