@@ -2,6 +2,7 @@
 
 open "battleship.frg"
 
+//shots outside of range 
 pred badBoard_shots{
   some board: Board | {
     some row, col: Int | {
@@ -14,6 +15,7 @@ pred badBoard_shots{
   }
 }
 
+//ships outside of range 
 pred badBoard_ships{
   some board: Board | {
     some row, col: Int | {
@@ -26,6 +28,7 @@ pred badBoard_ships{
   }
 }
 
+//All positions are empty
 pred empty_board{
   all board: Board, row, col: Int | {
     board.shots[row][col] = False
@@ -33,13 +36,13 @@ pred empty_board{
   }
 }
 
+//Everything in range is true
 pred all_true_inrange{
   all board: Board, row, col: Int | {
     (row < 0 or col < 0 or row > 7 or col > 7) implies board.shots[row][col] = False
     (row < 0 or col < 0 or row > 7 or col > 7) implies board.ships[row][col] = False
     (row >= 0 and col >= 0 and row <= 7 and col <= 7) implies board.shots[row][col] = True 
     (row >= 0 and col >= 0 and row <= 7 and col <= 7) implies board.ships[row][col] = True
-    // board.ships[row][col] = False
   }
 }
 
@@ -53,18 +56,21 @@ test suite for board_wellformed {
     assert all_true_inrange is sufficient for board_wellformed
 }
 
+//No ships on board
 pred no_ships[board:Board]{
   all row, col : Int | {
     board.ships[row][col] = False
   }
 }
 
+//Every postion contains a ship
 pred too_many_ships[board: Board]{
   all row, col : Int | {
     board.ships[row][col] = True
   }
 }
 
+//There are exactly five ships on the board
 pred five_ships[board: Board]{
   all row, col : Int | {
     ((row = 0 and col = 0) or 
@@ -83,7 +89,7 @@ test suite for ship_wellformed {
     }
 }
 
-
+//The board contains at least one shot 
 pred board_contains_shot[board: Board] {
   some row, col: Int | {
     (row >= 0 and col >= 0 and row <= 7 and col <= 7)
@@ -91,11 +97,13 @@ pred board_contains_shot[board: Board] {
   }
 }
 
+//Some board in boardstate contains a shot
 pred bad_init_boardstate[b: BoardState]{
   board_contains_shot[b.player1] or
   board_contains_shot[b.player2]
 }
 
+//One of the boards doesn't have exactly 5 ships
 pred ship_badlyformed_boardstate[b: BoardState]{
   not ship_wellformed[b.player1] or
   not ship_wellformed[b.player2]
@@ -109,6 +117,7 @@ test suite for init {
     }
 }
 
+//Both boards have same number of shots
 pred boardStateWithEvenNumberShots[board: Board]{
   some numShots: Int | {
     countShots[board.player1] = numShots
@@ -116,6 +125,7 @@ pred boardStateWithEvenNumberShots[board: Board]{
   }
 }
 
+//Player1 has one more shot on their board
 pred boardStateWithOneMoreShot[board: BoardState]{
   some numShots: Int | {
     countShots[board.player1] = numShots
