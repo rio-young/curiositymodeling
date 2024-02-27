@@ -1,6 +1,8 @@
 #lang forge/bsl
 option run_sterling "vis.js"
 
+option run_sterling "vis.js"
+
 abstract sig Boolean {}
 one sig True, False extends Boolean {}
 
@@ -38,8 +40,8 @@ pred init[board: BoardState] {
 
   // Board needs to all be false
   all row, col: Int | {
-    board.player1.shots[row][col] = False
-    board.player2.shots[row][col] = False
+    (row >= 0 and row <= MAX and col >= 0 and col <= MAX) implies board.player1.shots[row][col] = False
+    (row >= 0 and row <= MAX and col >= 0 and col <= MAX) implies board.player2.shots[row][col] = False
   }
 
   ship_wellformed[board.player1]
