@@ -108,3 +108,60 @@ test suite for init {
       badShips : { (all boardState : BoardState | ship_badlyformed_boardstate[boardState] and init[boardState] )} is unsat
     }
 }
+
+pred boardStateWithEvenNumberShots[board: Board]{
+  some numShots: Int | {
+    countShots[board.player1] = numShots
+    and countShots[board.player2] = numShots
+  }
+}
+
+pred boardStateWithOneMoreShot[board: BoardState]{
+  some numShots: Int | {
+    countShots[board.player1] = numShots
+    and countShots[board.player2] = subtract[numShots, 1]
+  }
+}
+
+test suite for player1Turn {
+    test expect {
+      boardWithEvenNumberShots : { (all board : BoardState | boardStateWithEvenNumberShots[board] and player1Turn[board] )} is sat
+      boardWithOneMoreShotPlayer1 : { (all board : BoardState | boardStateWithOneMoreShot[board] and player1Turn[board] )} is unsat
+    }
+}
+
+test suite for player2Turn {
+    test expect {
+      boardWithOneMoreShot : { (all board : BoardState | boardStateWithOneMoreShot[board] and player2Turn[board] )} is sat
+      boardWithEvenNumberShotsPlayer2 : { (all board : BoardState | boardStateWithEvenNumberShots[board] and player2Turn[board] )} is unsat
+    }
+}
+
+pred onlyOneShot[pre, post: BoardState]{
+  add[countShots[pre.player1], countShots[pre.player2]] = subtract[add[countShots[post.player1], countShots[post.player2]], 1]
+}
+
+test suite for move {
+    test expect {
+      takesOnlyOneShot: {all b: BoardState | {
+        (player1Turn[Game.next[b]] or player2Turn[Game.next[b]])
+          some Game.next[b] => {
+            some row, col: Int | {
+              move[b, Game.next[b], row, col]
+              and onlyOneShot[b, Game.next[b]]
+            } 
+          }
+        }
+      } is sat
+      possibleInvalidTurn: {all b: BoardState | {
+        (player1Turn[Game.next[b]] and player2Turn[Game.next[b]])
+          some Game.next[b] => {
+            some row, col: Int | {
+              move[b, Game.next[b], row, col]
+              and onlyOneShot[b, Game.next[b]]
+            } 
+          }
+        }
+      } is unsat
+  }
+}
