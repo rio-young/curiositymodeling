@@ -28,15 +28,18 @@ pred badBoard_ships{
 
 pred empty_board{
   all board: Board, row, col: Int | {
-    board.shots[row][col] = False
-    board.ships[row][col] = False
+    no board.shots[row][col]
+    no board.ships[row][col]
   }
 }
 
 pred all_true_inrange{
   all board: Board, row, col: Int | {
-    (row >=0 and col >=0 and row <= 7 and col <=7) implies board.shots[row][col] = True else board.shots[row][col] = False
-    board.ships[row][col] = False
+    (row < 0 or col < 0 or row > 7 or col > 7) implies no board.shots[row][col]
+    (row < 0 or col < 0 or row > 7 or col > 7) implies no board.ships[row][col]
+    (row >= 0 and col >= 0 and row <= 7 and col <= 7) implies board.shots[row][col] = True 
+    (row >= 0 and col >= 0 and row <= 7 and col <= 7) implies board.ships[row][col] = True
+    // board.ships[row][col] = False
   }
 }
 
@@ -83,6 +86,7 @@ test suite for ship_wellformed {
 
 pred board_contains_shot[board: Board] {
   some row, col: Int | {
+    (row >= 0 and col >= 0 and row <= 7 and col <= 7)
     board.shots[row][col] = True
   }
 }

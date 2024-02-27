@@ -1,5 +1,7 @@
 #lang forge/bsl
 
+option run_sterling "vis.js"
+
 abstract sig Boolean {}
 one sig True, False extends Boolean {}
 
@@ -37,8 +39,8 @@ pred init[board: BoardState] {
 
   // Board needs to all be false
   all row, col: Int | {
-    board.player1.shots[row][col] = False
-    board.player2.shots[row][col] = False
+    (row >= 0 and row <= MAX and col >= 0 and col <= MAX) implies board.player1.shots[row][col] = False
+    (row >= 0 and row <= MAX and col >= 0 and col <= MAX) implies board.player2.shots[row][col] = False
   }
 
   ship_wellformed[board.player1]
@@ -52,9 +54,17 @@ pred board_wellformed {
   // Player shots have to be 0-9
   // Player ships have to be 0-9
   all row, col: Int, board: Board | {
-    board.shots[row][col] = True implies row >= 0 and row <= MAX and col >= 0 and col <= MAX
-    board.ships[row][col] = True implies row >= 0 and row <= MAX and col >= 0 and col <= MAX
+    not no board.shots[row][col] implies row >= 0 and row <= MAX and col >= 0 and col <= MAX
+    not no board.ships[row][col] implies row >= 0 and row <= MAX and col >= 0 and col <= MAX
   }
+
+  // all b: Board | { 
+  //       all row, col: Int | {
+  //           (row < 0 or row > MAX or 
+  //           col < 0 or col > MAX) implies
+  //               no b.shots[row][col]
+  //               // no b.ships[row][col]
+  //   } }
 
   // all boardState: BoardState | {
   //   boardState.player1 != boardState.player2
@@ -68,6 +78,8 @@ pred board_wellformed {
   // }
 
 }
+
+// run {board_wellformed} for 1 BoardState
 
 
 pred player1Turn[b: BoardState] {
@@ -143,7 +155,7 @@ pred trace {
   // Check for win and keep same if won
 }
 
-run {trace} for exactly 3 BoardState for {next is linear}
+run {trace} for 3 BoardState for {next is linear}
 
 // Winning
 pred winning[b: BoardState] {
