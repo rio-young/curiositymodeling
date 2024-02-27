@@ -1,83 +1,145 @@
-// INSTRUCTIONS: Since this script loads external elements, "Execute" may need to be run twice
-// to guarantee that visualization is showing properly.
+const d3 = require("d3");
+d3.selectAll("svg > *").remove();
 
-// Setup for importing necessary scripts/plugins
-function loadSources() {
-  var styleSheet = document.createElement('link');
-  styleSheet.setAttribute('rel','stylesheet');
-  styleSheet.setAttribute('href','https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css');
-  styleSheet.setAttribute('integrity','sha384-q94+BZtLrkL1/ohfjR8c6L+A6qzNH9R2hBLwyoAfu3i/WCvQjzL2RQJ3uNHDISdU');
-  styleSheet.setAttribute('crossorigin','anonymous');
-  document.head.appendChild(styleSheet);
+/*
+  Visualizer for the in-class tic-tac-toe model. This is written in "raw" 
+  D3, rather than using our helper libraries. If you're familiar with 
+  visualization in JavaScript using this popular library, this is how you 
+  would use it with Forge.
 
-  var jQueryImport = document.createElement('script');
-  jQueryImport.setAttribute('src','https://code.jquery.com/jquery-3.5.1.min.js');
-  jQueryImport.setAttribute('integrity','sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2');
-  jQueryImport.setAttribute('crossorigin','anonymous');
-  document.head.appendChild(jQueryImport);
+  Note that if you _aren't_ familiar, that's OK; we'll show more examples 
+  and give more guidance in the near future. The helper library also makes 
+  things rather easier. 
 
-  var chessboardImport = document.createElement('script');
-  chessboardImport.setAttribute('src','https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js');
-  chessboardImport.setAttribute('integrity','sha384-8Vi8VHwn3vjQ9eUHUxex3JSN/NFqUg3QbPyX8kWyb93+8AC/pPWTzj+nHtbC5bxD');
-  chessboardImport.setAttribute('crossorigin','anonymous');
-  document.head.appendChild(chessboardImport);
+  TN 2024
+
+  Note: if you're using this style, the require for d3 needs to come before anything 
+  else, even comments.
+*/
+
+function printValue(row, col, yoffset, value, xoffset) {
+  d3.select(svg)
+    .append("text")
+    .style("fill", "black")
+    .attr("x", (row + 1) * 10 + xoffset)
+    .attr("y", (col + 1) * 14 + yoffset)
+    .text(value);
 }
 
-
-
-function boardFENString(board) {
-
-  var boardArr = [];
-  for (r = 0; r < 8; r++) {
-    var thisRank = [];
-    for (f = 0; f < 8; f++) {
-      thisRank.push("1");
+function printPlayer1Shots(stateAtom, yoffset) {
+  for (r = 0; r <= 7; r++) {
+    for (c = 0; c <= 7; c++) {
+      printValue(
+        r,
+        c,
+        yoffset,
+        stateAtom.player1.shots[r][c].toString().substring(0, 1),
+        0
+      );
     }
-    boardArr.push(thisRank);
   }
-  
-  const positions = board.join(position).tuples();
-  for (idx = 0; idx < positions.length; idx++) {
-      const atms = positions[idx]._atoms;
-      const thisFile = atms[0].toString() ;
-      const thisRank = atms[1].toString() ;
-      if(0 <= thisFile && thisFile <= 7 && 0 <= thisRank && thisRank <=7){
-         boardArr[thisFile][thisRank] = "q";
-      }
-  } 
 
-  var boardString = "";
-  for (r = 7; r >= 0; r--) {
-    for (f = 0; f < 8; f++) {
-      boardString += boardArr[r][f];
+  d3.select(svg)
+    .append("rect")
+    .attr("x", 5)
+    .attr("y", yoffset + 1)
+    .attr("width", 90)
+    .attr("height", 120)
+    .attr("stroke-width", 2)
+    .attr("stroke", "black")
+    .attr("fill", "transparent");
+}
+
+function printPlayer2Shots(stateAtom, yoffset) {
+  xoffset = 200;
+  for (r = 0; r <= 7; r++) {
+    for (c = 0; c <= 7; c++) {
+      printValue(
+        r,
+        c,
+        yoffset,
+        stateAtom.player2.shots[r][c].toString().substring(0, 1),
+        xoffset
+      );
     }
-    boardString += "/";
   }
-  console.log(boardString.slice(0, -1));
-  return boardString.slice(0, -1);
+
+  d3.select(svg)
+    .append("rect")
+    .attr("x", xoffset + 5)
+    .attr("y", yoffset + 1)
+    .attr("width", 90)
+    .attr("height", 120)
+    .attr("stroke-width", 2)
+    .attr("stroke", "black")
+    .attr("fill", "transparent");
 }
 
-function loadChessboard() {
-  //setColors();
-  let board = Board
-    var config = {
-      pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
-      position: boardFENString(board)
+function printPlayer1Ships(stateAtom, yoffset) {
+  xoffset = 95;
+  for (r = 0; r <= 7; r++) {
+    for (c = 0; c <= 7; c++) {
+      if (
+        stateAtom.player1.ships[r][c] != null &&
+        stateAtom.player1.ships[r][c].toString().substring(0, 1) != "F"
+      )
+        printValue(
+          r,
+          c,
+          yoffset,
+          stateAtom.player1.ships[r][c].toString().substring(0, 1),
+          xoffset
+        );
     }
-    var chessboard = document.createElement('div');
-    var boardName = 'board' ;
-    chessboard.setAttribute('id',boardName);
-    chessboard.setAttribute('style','width: 300px; margin: 10px');
-    div.appendChild(chessboard);
-    var board1 = Chessboard(boardName, config)
-  
+  }
 
+  d3.select(svg)
+    .append("rect")
+    .attr("x", xoffset)
+    .attr("y", yoffset + 1)
+    .attr("width", 90)
+    .attr("height", 120)
+    .attr("stroke-width", 2)
+    .attr("stroke", "black")
+    .attr("fill", "transparent");
 }
 
-div.innerHTML = '';
-div.style.overflow = 'scroll';
-if (!document.head.innerHTML.includes('chessboardjs@1.0.0')) {
-  alert('Since this script loads external elements, "Execute" may need to be run twice or thrice (!!) to guarantee that visualization is showing properly.');
+function printPlayer2Ships(stateAtom, yoffset) {
+  xoffset = 295;
+  for (r = 0; r <= 7; r++) {
+    for (c = 0; c <= 7; c++) {
+      if (
+        stateAtom.player2.ships[r][c] != null &&
+        stateAtom.player2.ships[r][c].toString().substring(0, 1) != "F"
+      )
+        printValue(
+          r,
+          c,
+          yoffset,
+          stateAtom.player2.ships[r][c].toString().substring(0, 1),
+          xoffset
+        );
+    }
+  }
+
+  d3.select(svg)
+    .append("rect")
+    .attr("x", xoffset)
+    .attr("y", yoffset + 1)
+    .attr("width", 90)
+    .attr("height", 120)
+    .attr("stroke-width", 2)
+    .attr("stroke", "black")
+    .attr("fill", "transparent");
 }
-loadSources();
-loadChessboard();
+
+var offset = 0;
+for (b = 0; b <= 10; b++) {
+  if (BoardState.atom("BoardState" + b) != null) {
+    printPlayer1Shots(BoardState.atom("BoardState" + b), offset);
+    printPlayer1Ships(BoardState.atom("BoardState" + b), offset);
+    printPlayer2Shots(BoardState.atom("BoardState" + b), offset);
+    printPlayer2Ships(BoardState.atom("BoardState" + b), offset);
+  }
+  offset = offset + 120;
+}
