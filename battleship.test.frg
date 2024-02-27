@@ -151,14 +151,25 @@ pred onlyOneShot[pre, post: BoardState]{
   add[countShots[pre.player1], countShots[pre.player2]] = subtract[add[countShots[post.player1], countShots[post.player2]], 1]
 }
 
+pred player1IsSame[pre, post: BoardState]{
+  pre.player1 = post.player1
+}
+
+pred player2IsSame[pre, post: BoardState]{
+  pre.player2 = post.player2
+}
+
 test suite for move {
     test expect {
       takesOnlyOneShot: {all b: BoardState | {
-        (player1Turn[Game.next[b]] or player2Turn[Game.next[b]])
+        (player1Turn[b] or player2Turn[b])
           some Game.next[b] => {
             some row, col: Int | {
               move[b, Game.next[b], row, col]
               and onlyOneShot[b, Game.next[b]]
+
+              player1Turn[b] => player2IsSame[b, Game.next[b]]
+              player2Turn[b] => player1IsSame[b, Game.next[b]]
             } 
           }
         }
