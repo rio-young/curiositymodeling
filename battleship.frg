@@ -105,11 +105,13 @@ pred move[pre, post: BoardState, row, col: Int] {
   row >= 0 and row <= MAX
   col >= 0 and col <= MAX
   
+  //If it's player 1's turn:
   player1Turn[pre] implies {
     pre.player1.shots[row][col] = False
     post.player1.shots[row][col] = True
 
     all row1, col1: Int | {
+      //If the position is not the changed postion, it must stay the same
       (row1 != row or col1 != col) implies {
         pre.player1.shots[row1][col1] = post.player1.shots[row1][col1]
       }
@@ -129,6 +131,7 @@ pred move[pre, post: BoardState, row, col: Int] {
     }
   }
 
+  //All ships stay in the same place
   all row3, col3: Int | {
     pre.player1.ships[row3][col3] = post.player1.ships[row3][col3]
     pre.player2.ships[row3][col3] = post.player2.ships[row3][col3]
@@ -155,7 +158,7 @@ pred trace {
   // Check for win and keep same if won
 }
 
-run {trace} for 3 BoardState for {next is linear}
+run {trace} for 5 BoardState for {next is linear}
 
 // Winning
 pred winning[b: BoardState] {

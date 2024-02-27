@@ -50,11 +50,39 @@ function printPlayer1Shots(stateAtom, yoffset) {
     .attr("fill", "transparent");
 }
 
-function printPlayer1Ships(stateAtom, yoffset) {
-  xoffset = 100;
+function printPlayer2Shots(stateAtom, yoffset) {
+  xoffset = 200;
   for (r = 0; r <= 7; r++) {
     for (c = 0; c <= 7; c++) {
-      if (stateAtom.player1.ships[r][c] != null)
+      printValue(
+        r,
+        c,
+        yoffset,
+        stateAtom.player2.shots[r][c].toString().substring(0, 1),
+        xoffset
+      );
+    }
+  }
+
+  d3.select(svg)
+    .append("rect")
+    .attr("x", xoffset + 5)
+    .attr("y", yoffset + 1)
+    .attr("width", 90)
+    .attr("height", 120)
+    .attr("stroke-width", 2)
+    .attr("stroke", "black")
+    .attr("fill", "transparent");
+}
+
+function printPlayer1Ships(stateAtom, yoffset) {
+  xoffset = 95;
+  for (r = 0; r <= 7; r++) {
+    for (c = 0; c <= 7; c++) {
+      if (
+        stateAtom.player1.ships[r][c] != null &&
+        stateAtom.player1.ships[r][c].toString().substring(0, 1) != "F"
+      )
         printValue(
           r,
           c,
@@ -67,7 +95,36 @@ function printPlayer1Ships(stateAtom, yoffset) {
 
   d3.select(svg)
     .append("rect")
-    .attr("x", xoffset, 5)
+    .attr("x", xoffset)
+    .attr("y", yoffset + 1)
+    .attr("width", 90)
+    .attr("height", 120)
+    .attr("stroke-width", 2)
+    .attr("stroke", "black")
+    .attr("fill", "transparent");
+}
+
+function printPlayer2Ships(stateAtom, yoffset) {
+  xoffset = 295;
+  for (r = 0; r <= 7; r++) {
+    for (c = 0; c <= 7; c++) {
+      if (
+        stateAtom.player2.ships[r][c] != null &&
+        stateAtom.player2.ships[r][c].toString().substring(0, 1) != "F"
+      )
+        printValue(
+          r,
+          c,
+          yoffset,
+          stateAtom.player2.ships[r][c].toString().substring(0, 1),
+          xoffset
+        );
+    }
+  }
+
+  d3.select(svg)
+    .append("rect")
+    .attr("x", xoffset)
     .attr("y", yoffset + 1)
     .attr("width", 90)
     .attr("height", 120)
@@ -78,8 +135,11 @@ function printPlayer1Ships(stateAtom, yoffset) {
 
 var offset = 0;
 for (b = 0; b <= 10; b++) {
-  if (BoardState.atom("BoardState" + b) != null)
+  if (BoardState.atom("BoardState" + b) != null) {
     printPlayer1Shots(BoardState.atom("BoardState" + b), offset);
-  printPlayer1Ships(BoardState.atom("BoardState" + b), offset);
+    printPlayer1Ships(BoardState.atom("BoardState" + b), offset);
+    printPlayer2Shots(BoardState.atom("BoardState" + b), offset);
+    printPlayer2Ships(BoardState.atom("BoardState" + b), offset);
+  }
   offset = offset + 120;
 }
